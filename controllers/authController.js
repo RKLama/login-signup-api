@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -138,5 +140,44 @@ const deleteAccount = async (req, res) => {
   }
 };
 
+const requestPasswordReset = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).json({ message: 'No user with this email' });
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiry = Date.now() + 1000 * 60 * 15; // 15 minutes
+
+    user.resetToken = token;
+    user.resetTokenExpiry = new Date(expiry);
+    await user.save();
+
+    // Setup nodemailer transport
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'yourgmail@gmail.com',
+        pass: 'your_app_password', // Use App Password if 2FA
+      },
+    });
+
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+
+    await transporter.sendMail({
+      from: '"Your App" <yourgmail@gmail.com>',
+      to: user.email,
+      subject: 'Password Reset',
+      html: `<p>Click the link to reset your password:</p><a href="${resetLink}">${resetLink}</a>`,
+    });
+
+    res.status(200).json({ message: 'Password reset email sent' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
 
 module.exports = { signup, login, updateProfile, changePassword, deleteAccount };
