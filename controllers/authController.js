@@ -67,4 +67,76 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { signup, login };
+const updateProfile = async (req, res) => {
+  const userId = req.user.id;
+  const { username, email, password } = req.body;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Update fields if provided
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (password) {
+      const hashed = await bcrypt.hash(password, 10);
+      user.password = hashed;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email
+      }
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+const changePassword = async (req, res) => {
+  const userId = req.user.id;
+  const { oldPassword, newPassword } = req.body;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Old password is incorrect' });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+const deleteAccount = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    await user.destroy();
+
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+
+module.exports = { signup, login, updateProfile, changePassword, deleteAccount };

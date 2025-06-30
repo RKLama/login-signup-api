@@ -6,6 +6,9 @@ const authenticateToken = require('../middleware/authMiddleware');
 // Signup & Login Routes
 router.post('/signup', signup);
 router.post('/login', login);
+router.put('/update', authenticateToken, updateProfile);
+router.post('/change-password', authenticateToken, changePassword);
+router.delete('/delete', authenticateToken, deleteAccount);
 
 // Protected route
 router.get('/me', authenticateToken, (req, res) => {
