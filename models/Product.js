@@ -10,7 +10,15 @@ const Product = sequelize.define('Product', {
   description: {
     type: DataTypes.STRING,
     allowNull: false,
-  }
+  },
+  price: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+    validate: {
+      isFloat: true,
+      min: 0,
+    },
+  },
 });
 
 module.exports = Product;
