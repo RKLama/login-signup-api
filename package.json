@@ -8,7 +8,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "ecommerce application",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dotenv": "^16.6.0",
