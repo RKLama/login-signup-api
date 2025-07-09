@@ -6,6 +6,8 @@ const {
   requestPasswordReset,
   resetPassword
 } = require('../controllers/authController');
+const { logout } = require('../controllers/authController');
+const { authenticate } = require('../middleware/authMiddleware');
 
 // Signup & Login Routes
 router.post('/signup', signup);
@@ -23,5 +25,9 @@ router.get('/me', authenticateToken, (req, res) => {
     user: req.user,
   });
 });
+
+router.post('/token', authController.refreshToken);
+
+router.post('/logout', authenticate, logout);
 
 module.exports = router;
