@@ -27,4 +27,6 @@ router.get('/me', authenticateToken, (req, res) => {
 
 router.post('/token', refreshAccessToken);
 
+router.post('/logout', requireAuth, logout);
+
 module.exports = router;

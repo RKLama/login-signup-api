@@ -239,4 +239,16 @@ const refreshAccessToken = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, updateProfile, changePassword, deleteAccount, requestPasswordReset, refreshAccessToken };
+const logout = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    await RefreshToken.destroy({ where: { userId } });
+    res.status(200).json({ message: 'Logged out successfully. Refresh token deleted.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong during logout' });
+  }
+};
+
+module.exports = { signup, login, updateProfile, changePassword, deleteAccount, requestPasswordReset, refreshAccessToken, logout };
