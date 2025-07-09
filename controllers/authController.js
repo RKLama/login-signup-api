@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const RefreshToken = require('../models/RefreshToken');
+const { Op } = require('sequelize');
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -180,4 +182,88 @@ const requestPasswordReset = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, updateProfile, changePassword, deleteAccount };
+const refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) return res.status(401).json({ message: 'Refresh token required' });
+
+  try {
+    // Find token in DB
+    const storedToken = await RefreshToken.findOne({
+      where: {
+        token: refreshToken,
+        isRevoked: false,
+        expiresAt: { [Op.gt]: new Date() },
+      },
+      include: 'User'
+    });
+
+    if (!storedToken || !storedToken.User) {
+      return res.status(403).json({ message: 'Invalid or expired refresh token' });
+    }
+
+    // Decode token
+    const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    // Revoke old token
+    storedToken.isRevoked = true;
+    await storedToken.save();
+
+    // Generate new tokens
+    const user = storedToken.User;
+
+    const newAccessToken = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+
+    const newRefreshToken = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    await RefreshToken.create({
+      token: newRefreshToken,
+      UserId: user.id,
+      userAgent: req.headers['user-agent'],
+      ipAddress: req.ip,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    return res.status(200).json({
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken
+    });
+
+  } catch (err) {
+    console.error(err);
+    return res.status(403).json({ message: 'Token verification failed' });
+  }
+};
+
+const logout = async (req, res) => {
+  const { refreshToken } = req.body;
+  const userId = req.user.id;
+
+  try {
+    const token = await RefreshToken.findOne({
+      where: { token: refreshToken, UserId: userId }
+    });
+
+    if (!token) {
+      return res.status(400).json({ message: 'Invalid or already revoked token' });
+    }
+
+    token.isRevoked = true;
+    await token.save();
+
+    res.status(200).json({ message: 'Logged out successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+module.exports = { signup, login, updateProfile, changePassword, deleteAccount, requestPasswordReset, refreshToken, logout };
