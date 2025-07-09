@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { RefreshToken } = require('../models');
+const { v4: uuidv4 } = require('uuid');
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -47,27 +49,41 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    // Create JWT token
-    const token = jwt.sign(
+    // Create access token (short-lived)
+    const accessToken = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: '1h' }
+      { expiresIn: '15m' } // short-lived
     );
 
-    res.status(200).json({
+    // Create refresh token (random UUID)
+    const refreshToken = uuidv4();
+
+    // Save refresh token in DB
+    await RefreshToken.create({
+      token: refreshToken,
+      userId: user.id,
+      expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    });
+
+    // Send tokens
+    return res.status(200).json({
       message: 'Login successful',
-      token,
+      accessToken,
+      refreshToken,
       user: {
         id: user.id,
         username: user.username,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Something went wrong' });
   }
 };
+
 
 const updateProfile = async (req, res) => {
   const userId = req.user.id;
@@ -180,4 +196,47 @@ const requestPasswordReset = async (req, res) => {
   }
 };
 
-module.exports = { signup, login, updateProfile, changePassword, deleteAccount };
+const refreshAccessToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  try {
+    if (!refreshToken) {
+      return res.status(400).json({ message: 'Refresh token required' });
+    }
+
+    // Find token in DB
+    const storedToken = await RefreshToken.findOne({ where: { token: refreshToken } });
+
+    if (!storedToken) {
+      return res.status(403).json({ message: 'Invalid refresh token' });
+    }
+
+    // Check if token expired
+    if (new Date() > storedToken.expiryDate) {
+      return res.status(403).json({ message: 'Refresh token expired' });
+    }
+
+    // Find the user
+    const user = await User.findByPk(storedToken.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Issue new access token
+    const newAccessToken = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+
+    res.status(200).json({
+      accessToken: newAccessToken,
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+module.exports = { signup, login, updateProfile, changePassword, deleteAccount, requestPasswordReset, refreshAccessToken };

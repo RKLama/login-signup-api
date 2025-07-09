@@ -6,6 +6,7 @@ const {
   requestPasswordReset,
   resetPassword
 } = require('../controllers/authController');
+const { refreshAccessToken } = require('../controllers/authController');
 
 // Signup & Login Routes
 router.post('/signup', signup);
@@ -23,5 +24,7 @@ router.get('/me', authenticateToken, (req, res) => {
     user: req.user,
   });
 });
+
+router.post('/token', refreshAccessToken);
 
 module.exports = router;
