@@ -15,6 +15,7 @@ router.post('/change-password', authenticateToken, changePassword);
 router.delete('/delete', authenticateToken, deleteAccount);
 router.post('/request-password-reset', requestPasswordReset);
 router.post('/reset-password', resetPassword);
+router.post('/logout', authController.logout);
 
 // Protected route
 router.get('/me', authenticateToken, (req, res) => {
@@ -23,5 +24,8 @@ router.get('/me', authenticateToken, (req, res) => {
     user: req.user,
   });
 });
+
+//Refresh Token
+router.post('/refresh-token', authController.refreshToken);
 
 module.exports = router;
