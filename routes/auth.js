@@ -8,6 +8,7 @@ const {
 } = require('../controllers/authController');
 const { logout } = require('../controllers/authController');
 const { authenticate } = require('../middleware/authMiddleware');
+const checkAuth = require('../middleware/authMiddleware');
 const checkRole = require('../middleware/roleMiddleware');
 
 // Signup & Login Routes
