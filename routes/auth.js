@@ -8,6 +8,7 @@ const {
 } = require('../controllers/authController');
 const { logout } = require('../controllers/authController');
 const { authenticate } = require('../middleware/authMiddleware');
+const checkRole = require('../middleware/roleMiddleware');
 
 // Signup & Login Routes
 router.post('/signup', signup);
@@ -29,5 +30,7 @@ router.get('/me', authenticateToken, (req, res) => {
 router.post('/token', authController.refreshToken);
 
 router.post('/logout', authenticate, logout);
+
+router.get('/verify-email', verifyEmail);
 
 module.exports = router;
