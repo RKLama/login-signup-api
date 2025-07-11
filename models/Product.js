@@ -5,10 +5,16 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Product extends Model {
     static associate(models) {
-      // Each product belongs to a single category
+      // Each product belongs to a category
       Product.belongsTo(models.Category, {
         foreignKey: 'categoryId',
         as: 'category',
+      });
+
+      // Each product can be added to many cart items
+      Product.hasMany(models.Cart, {
+        foreignKey: 'productId',
+        as: 'cartItems',
       });
     }
   }
