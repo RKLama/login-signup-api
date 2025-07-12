@@ -7,6 +7,7 @@ const User = require('./models/User'); // add this line
 const userRoutes = require('./routes/users');
 const orderRoutes = require('./routes/orders');
 const reviewRoutes = require('./routes/reviews');
+const wishlistRoutes = require('./routes/wishlist');
 
 // Middleware
 app.use(express.json());
@@ -16,6 +17,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Start the server after DB sync
 const PORT = process.env.PORT || 5000;
