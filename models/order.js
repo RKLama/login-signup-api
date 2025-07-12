@@ -30,6 +30,14 @@ module.exports = (sequelize, DataTypes) => {
     totalAmount: {
       type: DataTypes.FLOAT,
       allowNull: false
+    },
+    paymentStatus: {
+      type: DataTypes.ENUM('pending', 'paid', 'failed'),
+      defaultValue: 'pending'
+    },
+    paymentReference: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,
