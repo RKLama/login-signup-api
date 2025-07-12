@@ -1,4 +1,5 @@
-const Product = require('../models/Product);
+const { Op } = require('sequelize');
+const { Product, Category } = require('../models');
 
 const getAllProducts = async (req, res) => {
 try {
@@ -17,4 +18,50 @@ try {
   }
 };
 
-module.exports = { getAllProducts};
+const searchProducts = async (req, res) => {
+  try {
+    const { keyword, category, minPrice, maxPrice, inStock } = req.query;
+
+    const whereClause = {};
+
+    if (keyword) {
+      whereClause[Op.or] = [
+        { name: { [Op.iLike]: `%${keyword}%` } },
+        { description: { [Op.iLike]: `%${keyword}%` } },
+      ];
+    }
+
+    if (category) {
+      whereClause.categoryId = category;
+    }
+
+    if (minPrice || maxPrice) {
+      whereClause.price = {};
+      if (minPrice) whereClause.price[Op.gte] = parseFloat(minPrice);
+      if (maxPrice) whereClause.price[Op.lte] = parseFloat(maxPrice);
+    }
+
+    if (inStock === 'true') {
+      whereClause.stock = { [Op.gt]: 0 };
+    }
+
+    const products = await Product.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: Category,
+          as: 'category',
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+
+    res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+module.exports = { getAllProducts, searchProducts, };
