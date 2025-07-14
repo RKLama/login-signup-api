@@ -7,5 +7,6 @@ router.get('/search', searchProducts);
 
 // All products route
 router.get('/', getAllProducts);
+router.get('/search/autocomplete', searchAutocomplete);
 
 module.exports = router;

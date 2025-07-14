@@ -76,5 +76,29 @@ const searchProducts = async (req, res) => {
   }
 };
 
+const searchAutocomplete = async (req, res) => {
+  const { q } = req.query;
 
-module.exports = { getAllProducts, searchProducts, };
+  if (!q || q.trim() === '') {
+    return res.status(400).json({ message: 'Search query is required' });
+  }
+
+  try {
+    const suggestions = await Product.findAll({
+      where: {
+        title: {
+          [Op.iLike]: `${q}%`, // Case-insensitive prefix match
+        },
+      },
+      attributes: ['id', 'title'],
+      limit: 10,
+    });
+
+    res.status(200).json({ suggestions });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { getAllProducts, searchProducts, searchAutocomplete };
