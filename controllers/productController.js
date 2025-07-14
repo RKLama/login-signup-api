@@ -2,16 +2,29 @@ const { Op } = require('sequelize');
 const { Product, Category } = require('../models');
 
 const getAllProducts = async (req, res) => {
-try {
-    if (!req.product || !req.product.isAdmin) {
+  try {
+    if (!req.user || req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Admin access required' });
     }
 
-    const products = await Product.findAll({
+    // Parse query parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // Get total count and paginated data
+    const { count, rows: products } = await Product.findAndCountAll({
+      offset,
+      limit,
       attributes: ['id', 'title', 'description', 'price']
     });
 
-    res.status(200).json({ products });
+    res.status(200).json({
+      currentPage: page,
+      totalPages: Math.ceil(count / limit),
+      totalItems: count,
+      products
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Something went wrong' });
