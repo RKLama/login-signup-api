@@ -101,4 +101,40 @@ const searchAutocomplete = async (req, res) => {
   }
 };
 
-module.exports = { getAllProducts, searchProducts, searchAutocomplete };
+const getRelatedProducts = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const product = await Product.findByPk(productId);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    const relatedProducts = await Product.findAll({
+      where: {
+        category: product.category,
+        id: { [Op.ne]: product.id },
+      },
+      limit: 4,
+    });
+
+    res.json({ relatedProducts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const getPopularProducts = async (req, res) => {
+  try {
+    const popularProducts = await Product.findAll({
+      order: [['salesCount', 'DESC']],
+      limit: 5,
+    });
+
+    res.json({ popularProducts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { getAllProducts, searchProducts, searchAutocomplete, getRelatedProducts, getPopularProducts };
