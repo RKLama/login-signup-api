@@ -6,6 +6,8 @@ const {
   requestPasswordReset,
   resetPassword
 } = require('../controllers/authController');
+const { requestPasswordReset } = require('../controllers/authController');
+const { resetPassword } = require('../controllers/authController');
 
 // Signup & Login Routes
 router.post('/signup', signup);
@@ -15,6 +17,9 @@ router.post('/change-password', authenticateToken, changePassword);
 router.delete('/delete', authenticateToken, deleteAccount);
 router.post('/request-password-reset', requestPasswordReset);
 router.post('/reset-password', resetPassword);
+router.post('/logout', authController.logout);
+router.post('/request-password-reset', requestPasswordReset);
+router.post('/reset-password', resetPassword)
 
 // Protected route
 router.get('/me', authenticateToken, (req, res) => {
@@ -23,5 +28,8 @@ router.get('/me', authenticateToken, (req, res) => {
     user: req.user,
   });
 });
+
+//Refresh Token
+router.post('/refresh-token', authController.refreshToken);
 
 module.exports = router;
