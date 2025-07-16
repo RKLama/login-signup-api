@@ -6,7 +6,12 @@ const {
   requestPasswordReset,
   resetPassword
 } = require('../controllers/authController');
+<<<<<<< HEAD
 const { refreshAccessToken } = require('../controllers/authController');
+=======
+const { logout } = require('../controllers/authController');
+const { authenticate } = require('../middleware/authMiddleware');
+>>>>>>> feat/logout_api
 
 // Signup & Login Routes
 router.post('/signup', signup);
@@ -25,8 +30,14 @@ router.get('/me', authenticateToken, (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 router.post('/token', refreshAccessToken);
 
 router.post('/logout', requireAuth, logout);
+=======
+router.post('/token', authController.refreshToken);
+
+router.post('/logout', authenticate, logout);
+>>>>>>> feat/logout_api
 
 module.exports = router;
