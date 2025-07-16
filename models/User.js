@@ -1,7 +1,14 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/db');
 
-const User = sequelize.define('User', {
+class User extends Model {
+  static associate(models) {
+    // One user can have many items in their cart
+    User.hasMany(models.Cart, { foreignKey: 'userId' });
+  }
+}
+
+User.init({
   username: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -19,6 +26,26 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  role: {
+    type: DataTypes.ENUM('user', 'admin'),
+    allowNull: false,
+    defaultValue: 'user',
+  },
+  verified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  emailVerificationToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  emailVerificationTokenExpiry: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  }
+}, {
+  sequelize,
+  modelName: 'User',
 });
 
 module.exports = User;

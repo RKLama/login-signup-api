@@ -24,19 +24,60 @@ const signup = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Generate email verification token and expiry
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const expiry = Date.now() + 1000 * 60 * 60; // 1 hour from now
+
+    // Create user with verification fields
     const newUser = await User.create({
       username,
       email,
       password: hashedPassword,
+      emailVerificationToken: verificationToken,
+      emailVerificationTokenExpiry: new Date(expiry),
+      verified: false
     });
 
-    res.status(201).json({ message: 'User registered successfully', user: { id: newUser.id, username, email } });
+    // Setup nodemailer (Gmail example)
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'yourgmail@gmail.com',
+        pass: 'your_app_password', // Use an App Password if 2FA is enabled
+      },
+    });
+
+    // Build verification link
+    const verifyLink = `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`;
+
+    // Send email
+    await transporter.sendMail({
+      from: '"Your App" <yourgmail@gmail.com>',
+      to: newUser.email,
+      subject: 'Verify Your Email',
+      html: `
+        <h3>Welcome to our app!</h3>
+        <p>Please verify your email by clicking the link below:</p>
+        <a href="${verifyLink}">${verifyLink}</a>
+        <p>This link will expire in 1 hour.</p>
+      `,
+    });
+
+    res.status(201).json({
+      message: 'User registered. Verification email sent.',
+      user: {
+        id: newUser.id,
+        username,
+        email
+      }
+    });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Something went wrong' });
   }
 };
+
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -46,6 +87,11 @@ const login = async (req, res) => {
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' });
+    }
+
+    // Check if user is verified
+    if (!user.verified) {
+      return res.status(403).json({ message: 'Please verify your email before logging in' });
     }
 
     // Compare password

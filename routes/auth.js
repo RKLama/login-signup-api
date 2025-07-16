@@ -11,7 +11,12 @@ const { refreshAccessToken } = require('../controllers/authController');
 =======
 const { logout } = require('../controllers/authController');
 const { authenticate } = require('../middleware/authMiddleware');
+<<<<<<< HEAD
 >>>>>>> feat/logout_api
+=======
+const checkAuth = require('../middleware/authMiddleware');
+const checkRole = require('../middleware/roleMiddleware');
+>>>>>>> feat/emailVerificationAfterSignup
 
 // Signup & Login Routes
 router.post('/signup', signup);
@@ -39,5 +44,7 @@ router.post('/token', authController.refreshToken);
 
 router.post('/logout', authenticate, logout);
 >>>>>>> feat/logout_api
+
+router.get('/verify-email', verifyEmail);
 
 module.exports = router;
