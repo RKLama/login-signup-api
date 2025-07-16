@@ -7,6 +7,7 @@
     "dialect": "postgres"
   },
   "test": {
+<<<<<<< HEAD
     "username": "postgres",
     "password": "rklboy123",
     "database": "testdb_test",
@@ -19,5 +20,19 @@
     "database": "testdb_prod",
     "host": "127.0.0.1",
     "dialect": "postgres"
+=======
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+>>>>>>> feat/product
   }
 }

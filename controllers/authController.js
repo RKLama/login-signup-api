@@ -4,12 +4,16 @@ const User = require('../models/User');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 <<<<<<< HEAD
+<<<<<<< HEAD
 const { RefreshToken } = require('../models');
 const { v4: uuidv4 } = require('uuid');
 =======
 const RefreshToken = require('../models/RefreshToken');
 const { Op } = require('sequelize');
 >>>>>>> feat/logout_api
+=======
+const { createRefreshToken } = require('../utils/token');
+>>>>>>> feat/product
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -248,6 +252,7 @@ const requestPasswordReset = async (req, res) => {
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 const refreshAccessToken = async (req, res) => {
   const { refreshToken } = req.body;
 
@@ -385,3 +390,45 @@ module.exports = { signup, login, updateProfile, changePassword, deleteAccount, 
 =======
 module.exports = { signup, login, updateProfile, changePassword, deleteAccount, requestPasswordReset, refreshToken, logout };
 >>>>>>> feat/logout_api
+=======
+const refreshToken = await createRefreshToken(user.id);
+
+res.json({
+  accessToken,
+  refreshToken: refreshToken.token
+});
+
+exports.refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) return res.status(400).json({ message: 'Refresh token is required' });
+
+  const foundToken = await db.RefreshToken.findOne({ where: { token: refreshToken } });
+
+  if (!foundToken) return res.status(403).json({ message: 'Invalid refresh token' });
+
+  if (foundToken.expiryDate < new Date()) {
+    await foundToken.destroy();
+    return res.status(403).json({ message: 'Refresh token expired' });
+  }
+
+  const user = await db.User.findByPk(foundToken.userId);
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  const newAccessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+  res.json({ accessToken: newAccessToken });
+};
+
+exports.logout = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) return res.status(400).json({ message: 'Refresh token is required' });
+
+  await db.RefreshToken.destroy({ where: { token: refreshToken } });
+
+  res.json({ message: 'Logged out successfully' });
+};
+
+module.exports = { signup, login, updateProfile, changePassword, deleteAccount, refreshToken };
+>>>>>>> feat/product

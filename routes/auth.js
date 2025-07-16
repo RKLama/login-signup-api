@@ -26,6 +26,7 @@ router.post('/change-password', authenticateToken, changePassword);
 router.delete('/delete', authenticateToken, deleteAccount);
 router.post('/request-password-reset', requestPasswordReset);
 router.post('/reset-password', resetPassword);
+router.post('/logout', authController.logout);
 
 // Protected route
 router.get('/me', authenticateToken, (req, res) => {
@@ -35,6 +36,7 @@ router.get('/me', authenticateToken, (req, res) => {
   });
 });
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 router.post('/token', refreshAccessToken);
 
@@ -46,5 +48,9 @@ router.post('/logout', authenticate, logout);
 >>>>>>> feat/logout_api
 
 router.get('/verify-email', verifyEmail);
+=======
+//Refresh Token
+router.post('/refresh-token', authController.refreshToken);
+>>>>>>> feat/product
 
 module.exports = router;
