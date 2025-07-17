@@ -23,7 +23,11 @@ const wishlistRoutes = require('./routes/wishlist');
 >>>>>>> feat/wishlist
 =======
 const adminRoutes = require('./routes/admin');
+<<<<<<< HEAD
 >>>>>>> feat/admin-dashboard
+=======
+const notificationRoutes = require('./routes/notifications');
+>>>>>>> feat/notifications
 
 // Middleware
 app.use(express.json());
@@ -53,7 +57,11 @@ app.use('/api/payments', require('./routes/payments'));
 >>>>>>> feat/payments
 =======
 app.use('/api/admin', adminRoutes);
+<<<<<<< HEAD
 >>>>>>> feat/admin-dashboard
+=======
+app.use('/api/notifications', notificationRoutes);
+>>>>>>> feat/notifications
 
 // Start the server after DB sync
 const PORT = process.env.PORT || 5000;
