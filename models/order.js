@@ -9,19 +9,42 @@ module.exports = (sequelize, DataTypes) => {
         as: 'user',
       });
 
+<<<<<<< HEAD
       // Order has many OrderItems
       Order.hasMany(models.OrderItem, {
         foreignKey: 'orderId',
         as: 'items',
       });
+=======
+      Order.hasOne(models.Invoice, {
+        foreignKey: 'orderId',
+        as: 'invoice',
+      });
+
+      // Optionally, Order can have many OrderItems (if you implement that)
+>>>>>>> feat/invoice
     }
   }
   Order.init({
     userId: DataTypes.INTEGER,
+<<<<<<< HEAD
     total: DataTypes.FLOAT,
     status: {
       type: DataTypes.STRING,
       defaultValue: 'pending',
+=======
+    status: {
+      type: DataTypes.ENUM('pending', 'processing', 'shipped', 'delivered', 'cancelled'),
+      defaultValue: 'pending'
+    },
+    paymentMethod: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    totalAmount: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+>>>>>>> feat/invoice
     }
   }, {
     sequelize,
