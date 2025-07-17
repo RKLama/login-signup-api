@@ -75,6 +75,7 @@ module.exports = { createOrder, getMyOrders, getAllOrders };
 =======
 const { Order, Invoice } = require('../models');
 const { v4: uuidv4 } = require('uuid');
+const sendEmail = require('../utils/sendEmail');
 
 const createOrder = async (req, res) => {
   try {
@@ -103,8 +104,18 @@ const createOrder = async (req, res) => {
       issuedAt: new Date(),
     });
 
+    // Send confirmation email
+    await sendEmail({
+      to: req.user.email,
+      subject: 'Order Confirmation',
+      text: `Your order (ID: ${order.id}) has been placed.`,
+      html: `<h2>Thank you for your order!</h2>
+             <p>Your order ID is <strong>${order.id}</strong>.</p>
+             <p>Total Amount: <strong>$${order.totalAmount.toFixed(2)}</strong></p>`
+    });
+
     res.status(201).json({
-      message: 'Order placed and invoice generated',
+      message: 'Order placed, invoice generated, and confirmation email sent.',
       order,
       invoice,
     });
