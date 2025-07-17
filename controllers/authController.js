@@ -13,7 +13,11 @@ const { Op } = require('sequelize');
 >>>>>>> feat/logout_api
 =======
 const { createRefreshToken } = require('../utils/token');
+<<<<<<< HEAD
 >>>>>>> feat/product
+=======
+const sendEmail = require('../utils/sendEmail');
+>>>>>>> feat/password-reset
 
 const signup = async (req, res) => {
   const { username, email, password } = req.body;
@@ -430,5 +434,74 @@ exports.logout = async (req, res) => {
   res.json({ message: 'Logged out successfully' });
 };
 
+<<<<<<< HEAD
 module.exports = { signup, login, updateProfile, changePassword, deleteAccount, refreshToken };
 >>>>>>> feat/product
+=======
+const requestPasswordReset = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email } });
+    if (!user) return res.status(404).json({ message: 'No user with that email' });
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const expiry = Date.now() + 60 * 60 * 1000; // 1 hour
+
+    user.passwordResetToken = resetToken;
+    user.passwordResetTokenExpiry = new Date(expiry);
+    await user.save();
+
+    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: 'Password Reset Request',
+      html: `
+        <p>Hello ${user.username},</p>
+        <p>Click the link below to reset your password:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>This link expires in 1 hour.</p>
+      `,
+    });
+
+    res.json({ message: 'Password reset link sent to your email' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { email, token, newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (
+      !user ||
+      user.passwordResetToken !== token ||
+      new Date() > user.passwordResetTokenExpiry
+    ) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+    user.passwordResetToken = null;
+    user.passwordResetTokenExpiry = null;
+
+    await user.save();
+
+    res.json({ message: 'Password has been reset successfully' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { signup, login, updateProfile, changePassword, deleteAccount, refreshToken, requestPasswordReset, resetPassword };
+>>>>>>> feat/password-reset

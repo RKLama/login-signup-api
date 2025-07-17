@@ -7,6 +7,7 @@ const {
   resetPassword
 } = require('../controllers/authController');
 <<<<<<< HEAD
+<<<<<<< HEAD
 const { refreshAccessToken } = require('../controllers/authController');
 =======
 const { logout } = require('../controllers/authController');
@@ -17,6 +18,10 @@ const { authenticate } = require('../middleware/authMiddleware');
 const checkAuth = require('../middleware/authMiddleware');
 const checkRole = require('../middleware/roleMiddleware');
 >>>>>>> feat/emailVerificationAfterSignup
+=======
+const { requestPasswordReset } = require('../controllers/authController');
+const { resetPassword } = require('../controllers/authController');
+>>>>>>> feat/password-reset
 
 // Signup & Login Routes
 router.post('/signup', signup);
@@ -27,6 +32,8 @@ router.delete('/delete', authenticateToken, deleteAccount);
 router.post('/request-password-reset', requestPasswordReset);
 router.post('/reset-password', resetPassword);
 router.post('/logout', authController.logout);
+router.post('/request-password-reset', requestPasswordReset);
+router.post('/reset-password', resetPassword)
 
 // Protected route
 router.get('/me', authenticateToken, (req, res) => {
