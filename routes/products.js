@@ -24,6 +24,7 @@ router.get('/', searchProducts); // supports search, filter, sort
 >>>>>>> feat/admin-dashboard
 =======
 const { getAllProducts, searchProducts } = require('../controllers/productController');
+const { getRelatedProducts, getPopularProducts } = require('../controllers/productController');
 
 // Search route (must be above :id route if present)
 router.get('/search', searchProducts);
@@ -34,6 +35,11 @@ router.get('/', getAllProducts);
 >>>>>>> feat/product-search
 =======
 router.get('/search/autocomplete', searchAutocomplete);
+<<<<<<< HEAD
 >>>>>>> feat/search-autocomplete
+=======
+router.get('/:productId/related', getRelatedProducts);
+router.get('/popular/all', getPopularProducts);
+>>>>>>> feat/product-recommendations
 
 module.exports = router;
