@@ -30,6 +30,10 @@ router.get('/search', searchProducts);
 
 // All products route
 router.get('/', getAllProducts);
+<<<<<<< HEAD
 >>>>>>> feat/product-search
+=======
+router.get('/search/autocomplete', searchAutocomplete);
+>>>>>>> feat/search-autocomplete
 
 module.exports = router;
