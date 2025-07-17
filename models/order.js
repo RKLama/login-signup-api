@@ -44,7 +44,18 @@ module.exports = (sequelize, DataTypes) => {
     totalAmount: {
       type: DataTypes.FLOAT,
       allowNull: false
+<<<<<<< HEAD
 >>>>>>> feat/invoice
+=======
+    },
+    paymentStatus: {
+      type: DataTypes.ENUM('pending', 'paid', 'failed'),
+      defaultValue: 'pending'
+    },
+    paymentReference: {
+      type: DataTypes.STRING,
+      allowNull: true
+>>>>>>> feat/update-payment-status
     }
   }, {
     sequelize,
