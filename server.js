@@ -41,7 +41,11 @@ app.use('/api/reviews', reviewRoutes);
 >>>>>>> feat/reviews
 =======
 app.use('/api/wishlist', wishlistRoutes);
+<<<<<<< HEAD
 >>>>>>> feat/wishlist
+=======
+app.use('/api/payments', require('./routes/payments'));
+>>>>>>> feat/payments
 
 // Start the server after DB sync
 const PORT = process.env.PORT || 5000;
