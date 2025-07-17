@@ -19,7 +19,11 @@ const reviewRoutes = require('./routes/reviews');
 >>>>>>> feat/reviews
 =======
 const wishlistRoutes = require('./routes/wishlist');
+<<<<<<< HEAD
 >>>>>>> feat/wishlist
+=======
+const adminRoutes = require('./routes/admin');
+>>>>>>> feat/admin-dashboard
 
 // Middleware
 app.use(express.json());
@@ -45,7 +49,11 @@ app.use('/api/wishlist', wishlistRoutes);
 >>>>>>> feat/wishlist
 =======
 app.use('/api/payments', require('./routes/payments'));
+<<<<<<< HEAD
 >>>>>>> feat/payments
+=======
+app.use('/api/admin', adminRoutes);
+>>>>>>> feat/admin-dashboard
 
 // Start the server after DB sync
 const PORT = process.env.PORT || 5000;

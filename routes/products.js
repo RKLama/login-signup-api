@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+<<<<<<< HEAD
 const {
   getAllProducts,
   getProductById,
@@ -15,5 +16,10 @@ router.get('/:id', getProductById);
 router.post('/', authenticate, createProduct);
 router.put('/:id', authenticate, updateProduct);
 router.delete('/:id', authenticate, deleteProduct);
+=======
+const { searchProducts } = require('../controllers/productController');
+
+router.get('/', searchProducts); // supports search, filter, sort
+>>>>>>> feat/admin-dashboard
 
 module.exports = router;

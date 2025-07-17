@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 const { Product, Category } = require('../models');
 
 const getAllProducts = async (req, res) => {
@@ -67,6 +68,9 @@ module.exports = {
   deleteProduct
 };
 =======
+=======
+const { Op } = require('sequelize');
+>>>>>>> feat/admin-dashboard
 const Product = require('../models/Product);
 
 const getAllProducts = async (req, res) => {
@@ -86,5 +90,50 @@ try {
   }
 };
 
+<<<<<<< HEAD
 module.exports = { getAllProducts};
 >>>>>>> feat/product
+=======
+const searchProducts = async (req, res) => {
+  try {
+    const { search, categoryId, minPrice, maxPrice, sortBy, order } = req.query;
+
+    const where = {};
+    const orderBy = [];
+
+    if (search) {
+      where[Op.or] = [
+        { name: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
+      ];
+    }
+
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
+
+    if (minPrice || maxPrice) {
+      where.price = {};
+      if (minPrice) where.price[Op.gte] = parseFloat(minPrice);
+      if (maxPrice) where.price[Op.lte] = parseFloat(maxPrice);
+    }
+
+    if (sortBy) {
+      orderBy.push([sortBy, order?.toUpperCase() === 'DESC' ? 'DESC' : 'ASC']);
+    }
+
+    const products = await Product.findAll({
+      where,
+      order: orderBy,
+      include: [{ model: Category, as: 'category', attributes: ['name'] }]
+    });
+
+    res.json({ products });
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { getAllProducts, searchProducts };
+>>>>>>> feat/admin-dashboard
