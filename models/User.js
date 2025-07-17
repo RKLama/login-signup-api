@@ -48,4 +48,15 @@ User.init({
   modelName: 'User',
 });
 
+<<<<<<< HEAD
+=======
+// 👇 Association with Review model
+User.associate = function (models) {
+  User.hasMany(models.Review, {
+    foreignKey: 'userId',
+    as: 'reviews',
+  });
+};
+
+>>>>>>> feat/reviews
 module.exports = User;

@@ -11,7 +11,11 @@ const categoryRoutes = require('./routes/categories');
 const cartRoutes = require('./routes/cart');
 =======
 const orderRoutes = require('./routes/orders');
+<<<<<<< HEAD
 >>>>>>> feat/order
+=======
+const reviewRoutes = require('./routes/reviews');
+>>>>>>> feat/reviews
 
 // Middleware
 app.use(express.json());
@@ -25,7 +29,11 @@ app.use('/categories', categoryRoutes);
 app.use('/api/cart', cartRoutes);
 =======
 app.use('/api/orders', orderRoutes);
+<<<<<<< HEAD
 >>>>>>> feat/order
+=======
+app.use('/api/reviews', reviewRoutes);
+>>>>>>> feat/reviews
 
 // Start the server after DB sync
 const PORT = process.env.PORT || 5000;
