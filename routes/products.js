@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 <<<<<<< HEAD
+<<<<<<< HEAD
 const {
   getAllProducts,
   getProductById,
@@ -21,5 +22,14 @@ const { searchProducts } = require('../controllers/productController');
 
 router.get('/', searchProducts); // supports search, filter, sort
 >>>>>>> feat/admin-dashboard
+=======
+const { getAllProducts, searchProducts } = require('../controllers/productController');
+
+// Search route (must be above :id route if present)
+router.get('/search', searchProducts);
+
+// All products route
+router.get('/', getAllProducts);
+>>>>>>> feat/product-search
 
 module.exports = router;

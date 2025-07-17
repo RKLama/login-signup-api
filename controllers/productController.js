@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 const { Product, Category } = require('../models');
 
 const getAllProducts = async (req, res) => {
@@ -72,6 +73,10 @@ module.exports = {
 const { Op } = require('sequelize');
 >>>>>>> feat/admin-dashboard
 const Product = require('../models/Product);
+=======
+const { Op } = require('sequelize');
+const { Product, Category } = require('../models');
+>>>>>>> feat/product-search
 
 const getAllProducts = async (req, res) => {
 try {
@@ -90,6 +95,7 @@ try {
   }
 };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 module.exports = { getAllProducts};
 >>>>>>> feat/product
@@ -131,9 +137,57 @@ const searchProducts = async (req, res) => {
     res.json({ products });
   } catch (error) {
     console.error('Search error:', error);
+=======
+const searchProducts = async (req, res) => {
+  try {
+    const { keyword, category, minPrice, maxPrice, inStock } = req.query;
+
+    const whereClause = {};
+
+    if (keyword) {
+      whereClause[Op.or] = [
+        { name: { [Op.iLike]: `%${keyword}%` } },
+        { description: { [Op.iLike]: `%${keyword}%` } },
+      ];
+    }
+
+    if (category) {
+      whereClause.categoryId = category;
+    }
+
+    if (minPrice || maxPrice) {
+      whereClause.price = {};
+      if (minPrice) whereClause.price[Op.gte] = parseFloat(minPrice);
+      if (maxPrice) whereClause.price[Op.lte] = parseFloat(maxPrice);
+    }
+
+    if (inStock === 'true') {
+      whereClause.stock = { [Op.gt]: 0 };
+    }
+
+    const products = await Product.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: Category,
+          as: 'category',
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+
+    res.status(200).json(products);
+  } catch (err) {
+    console.error(err);
+>>>>>>> feat/product-search
     res.status(500).json({ message: 'Server error' });
   }
 };
 
+<<<<<<< HEAD
 module.exports = { getAllProducts, searchProducts };
 >>>>>>> feat/admin-dashboard
+=======
+
+module.exports = { getAllProducts, searchProducts, };
+>>>>>>> feat/product-search
